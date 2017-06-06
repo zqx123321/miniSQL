@@ -110,6 +110,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="api.h" />
+    <ClInclude Include="buffer.h" />
+    <ClInclude Include="catalog.h" />
+    <ClInclude Include="index.h" />
+    <ClInclude Include="interpreter.h" />
+    <ClInclude Include="minisql.h" />
+    <ClInclude Include="record.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="api.cpp" />
+    <ClCompile Include="buffer.cpp" />
+    <ClCompile Include="catalog.cpp" />
+    <ClCompile Include="index.cpp" />
+    <ClCompile Include="interpreter.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="record.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
