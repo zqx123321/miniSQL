@@ -2,34 +2,29 @@
 #include "minisql.h"
 
 class Page {
+	friend class Buffer;
 private:
-	unsigned int  FileID;	//	the file it belongs to
-	unsigned long PageID;	//	its number
-	bool lastUsed;			//	if it's used the last time
-	void* head;				// Physical addr. for this page
-	char* data;				// Physical data for this page
+	fileType type;	//	the file it belongs to
+	int offset;		//  page offset
+	bool pin;		//  if it's pinned
+	bool lastUsed;	//	if it's used the last time
+	bool dirty;		//  if it's consistent with the disk
+	char* head;		
+	//  physical a ddr. for this page
 public:
-	Page();
+	Page(fileType t, int o);
 	~Page();
 };
 
-class File {
-protected:
-	unsigned int ID;
-	string path;
-	void *head;
-public:
-	File(unsigned int i, string p);
-	virtual ~File();
-};
-
 class Buffer {
+	friend class Page;
 public:
-	Buffer(string c, string r, string i);
+	Buffer();
+	const char* readFirstPage(fileType type); // read from buffer
+	char* addPage(fileType type, int offset);
+	
 private:
-	string catalogPath;
-	string recordPath;
-	string indexPath;
-
+	vector<string> filePath;
+	vector<Page> pageList;
 };
 

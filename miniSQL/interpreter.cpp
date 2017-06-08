@@ -3,6 +3,8 @@
 #include "api.h"
 #include "minisql.h"
 
+extern Catalog* CatalogManager;
+
 void INTERPRETER_Main() {
 	INTERPRETER_Welcome();
 	opType operation = CREATE;
@@ -81,6 +83,8 @@ opType INTERPRETER_GetOp() {
 }
 
 void INTERPRETER_Create() {
+	vector<string> command;
+
 	// read in all the word
 	string word;
 	string sentence;
@@ -91,7 +95,6 @@ void INTERPRETER_Create() {
 	} while (word.back() != ';');
 	
 	// parse for create
-	vector<string> command;
 	vector<string> element = split(sentence);
 	vector<string>::const_iterator iter = element.begin();
 	
@@ -101,52 +104,61 @@ void INTERPRETER_Create() {
 	else if (*iter == "table") {
 		iter++;
 		if(iter != element.end()) {
-			string temp = *iter;
-			if (CatalogManager->FindTable(temp) == true)
+			string tableName = *iter;
+			if (CatalogManager->FindTable(tableName) == true)
 				throw "Table name already exists!";
-			command.push_back(temp); // table name
 			iter++;
-
 			bool done = false;
-			string attrName, attrType, attrType_app, unique;
+			TableDef newTable(tableName, 0);
+
 			while (1) {
+				string attrName;
+				dataType type;
+				int width;
+				bool unique;
+				bool isKey;
+
 				done = false;
 				attrName = *iter;
 				if (attrName == "primary")
 					throw "primary is a key word, you may not use it!";
-
 				iter++;
 				if (iter == element.end())
 					break;
 
-				attrType = *iter;
+				string attrType = *iter;
 				if (attrType != "int" && attrType != "float" && attrType != "char")
 					throw "Undefined data type!";
 				if (attrType == "char") {
+					type = CHAR;
 					iter++;
 					if (iter == element.end())
 						break;
-					else
-						attrType_app = *iter;
+					else {
+						string temp = *iter;
+						width = atoi(temp.c_str());
+					}
 				}
-				else
-					attrType_app = "0";
+				else {
+					width = 0;
+					if (attrType == "int")
+						type = INT;
+					else
+						type = FLOAT;
+				}
 				iter++;
 
 				if (iter != element.end() && *iter == "unique") {
-					unique = "1";
+					unique = true;
 					iter++;
 				}
 				else
-					unique = "0";
-				command.push_back(attrName);
-				command.push_back(attrType);
-				command.push_back(attrType_app);
-				command.push_back(unique);
-				done = true;
-				//cout << *iter << endl;
-				//cout << element.size();
+					unique = false;
+				isKey = false;
 
+				AttrDef newAttr(attrName, type, width, unique, isKey);
+				newTable.attrList.push_back(newAttr);
+				done = true;
 				if (iter == element.end() || *iter == "primary")
 					break;
 			}
@@ -165,17 +177,39 @@ void INTERPRETER_Create() {
 						done = false;
 					else {
 						string priKey = *iter;
-						command.push_back("primary");
-						command.push_back(priKey);
+						newTable.primaryKey = priKey;
 					}
 				}
 			}
 			if (done == false)
 				throw "Information is not complete enough to create a table!";
+			
+		// construct the command
+			char buf[64];
+			string temp;
+			/*
+			command.push_back(newTable.name);
+			command.push_back(newTable.primaryKey);
+			sprintf(buf, "%d", newTable.columnNum);
+			temp = buf;
+			command.push_back(temp);
+			*/
+
+
+			cout << sizeof(newTable);
+
 		}
 		else
 			throw "Table name empty!";
-		// for test
+
+		/*
+		char buf[10];
+		sprintf(buf, "%d", columnNum);
+		string count(buf);
+		vector<string>::const_iterator iter2;
+		iter2 = command.begin();
+		command.insert(iter2 + 1, count);*/
+		
 		
 		API_Main(CREATE_TABLE, command);
 	}

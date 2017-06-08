@@ -2,19 +2,25 @@
 
 Catalog* CatalogManager;
 
-AttrDef::AttrDef(string n, dataType t, int w, bool u) : 
-	name(n), type(t), width(w), unique(u) {
+AttrDef::AttrDef(string n, dataType t, int w, bool u, bool k) : 
+	name(n), type(t), width(w), unique(u), isKey(k) {
 }
 
 TableDef::TableDef(string n, int c) : name(n), columnNum(c) {}
 
-void TableDef::addAttr(AttrDef a) {
-	attrList.push_back(a);
-}
-
 IndexDef::IndexDef(string t, string a) : tableName(t), attrName(a) {}
 
-void Catalog::CreateTable(vector<string> cmd) {
+/*
+test command:
+create table jzf(name char(8) unique, age int, salary float, primary key (name));
+*/
+
+void Catalog::CreateTable(vector<string> cmd) { 
+	for (int i = 0; i < cmd.size(); i++)
+		cout << cmd.at(i) << ' ';
+	cout << endl;
+
+	/*
 	int count = 0;
 	string priKey;
 	vector<string>::const_iterator iter = cmd.begin() + 1; 
@@ -57,7 +63,7 @@ void Catalog::CreateTable(vector<string> cmd) {
 	t.primaryKey = priKey;
 	allTables.push_back(t);
 	cout << "Create successfully!";
-	cout << count << " row(s) affected." << endl;
+	cout << count << " row(s) affected." << endl; */
 }
 
 void Catalog::CreateIndex(vector<string> cmd) {
@@ -65,6 +71,7 @@ void Catalog::CreateIndex(vector<string> cmd) {
 }
 
 bool Catalog::FindTable(string temp) const {
+
 	vector<TableDef>::const_iterator iter;
 	iter = allTables.begin();
 	while (iter != allTables.end()) {
@@ -73,4 +80,5 @@ bool Catalog::FindTable(string temp) const {
 		iter++;
 	}
 	return false;
+
 }

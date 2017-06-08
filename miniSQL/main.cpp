@@ -6,6 +6,11 @@
 #include "record.h"
 #include "index.h"
 
+extern Record* RecordManager;
+extern Index* IndexManager;
+extern Catalog* CatalogManager;
+extern Buffer* BufferManager;
+
 void TOP_Initial();
 void TOP_execute();
 void TOP_exit();
@@ -20,7 +25,7 @@ void TOP_Initial() {
 	CatalogManager = new Catalog();
 	RecordManager = new Record();
 	IndexManager = new Index();
-	BufferManager = new Buffer("../catalog", "../record", "../index");
+	BufferManager = new Buffer();
 }
 
 void TOP_execute() {

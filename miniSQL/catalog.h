@@ -4,28 +4,6 @@
 #include "minisql.h"
 using namespace std;
 
-class AttrDef {
-public:
-	AttrDef(string n, dataType d, int w, bool u);
-private:
-	string name;
-	dataType type;
-	int width;
-	bool unique;
-};
-
-class TableDef {
-	friend class Catalog;
-public:
-	TableDef(string n, int c);
-	void addAttr(AttrDef a);
-private:	
-	string name;
-	string primaryKey;
-	int columnNum;
-	vector<AttrDef> attrList;
-};
-
 class IndexDef {
 public:
 	IndexDef(string t, string a);
@@ -44,4 +22,3 @@ private:
 	vector<IndexDef> allIndexes;
 };
 
-void CATALOG_Initial();

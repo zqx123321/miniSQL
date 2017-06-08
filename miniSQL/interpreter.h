@@ -1,5 +1,5 @@
 #pragma once
-
+#include "minisql.h"
 enum opType;
 
 opType INTERPRETER_GetOp();
@@ -13,3 +13,5 @@ void INTERPRETER_Delete();
 void INTERPRETER_Drop();
 void INTERPRETER_Execfile();
 
+extern struct AttrDef;
+extern struct TableDef;

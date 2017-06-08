@@ -1,6 +1,8 @@
 #include "api.h"
 #include "catalog.h"
 
+extern Catalog* CatalogManager;
+
 void API_Main(opType type, vector<string> command) {
 	switch (type) {
 	case CREATE_TABLE:
