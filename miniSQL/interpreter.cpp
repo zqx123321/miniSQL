@@ -103,21 +103,15 @@ void INTERPRETER_Create() {
 	}
 	else if (*iter == "table") {
 		iter++;
-		if(iter != element.end()) {
-			string tableName = *iter;
-			if (CatalogManager->FindTable(tableName) == true)
-				throw "Table name already exists!";
+		if (iter != element.end()) {
+			string temp = *iter;
+			command.push_back(temp); // table name
 			iter++;
+
 			bool done = false;
-			TableDef newTable(tableName, 0);
-
+			string attrName, attrType, attrType_app, unique;
+			int columnNum = 0;
 			while (1) {
-				string attrName;
-				dataType type;
-				int width;
-				bool unique;
-				bool isKey;
-
 				done = false;
 				attrName = *iter;
 				if (attrName == "primary")
@@ -126,39 +120,35 @@ void INTERPRETER_Create() {
 				if (iter == element.end())
 					break;
 
-				string attrType = *iter;
-				if (attrType != "int" && attrType != "float" && attrType != "char")
+				attrType = *iter;
+				if (attrType != "int" && attrType != "float" && attrType != "char") {
 					throw "Undefined data type!";
+					break;
+				}
 				if (attrType == "char") {
-					type = CHAR;
 					iter++;
 					if (iter == element.end())
 						break;
-					else {
-						string temp = *iter;
-						width = atoi(temp.c_str());
-					}
-				}
-				else {
-					width = 0;
-					if (attrType == "int")
-						type = INT;
 					else
-						type = FLOAT;
+						attrType_app = *iter;
 				}
+				else
+					attrType_app = "0";
 				iter++;
 
 				if (iter != element.end() && *iter == "unique") {
-					unique = true;
+					unique = "1";
 					iter++;
 				}
 				else
-					unique = false;
-				isKey = false;
-
-				AttrDef newAttr(attrName, type, width, unique, isKey);
-				newTable.attrList.push_back(newAttr);
+					unique = "0";
+				command.push_back(attrName);
+				command.push_back(attrType);
+				command.push_back(attrType_app);
+				command.push_back(unique);
+				columnNum++;
 				done = true;
+
 				if (iter == element.end() || *iter == "primary")
 					break;
 			}
@@ -177,45 +167,30 @@ void INTERPRETER_Create() {
 						done = false;
 					else {
 						string priKey = *iter;
-						newTable.primaryKey = priKey;
+						command.push_back(priKey);
 					}
 				}
 			}
 			if (done == false)
 				throw "Information is not complete enough to create a table!";
-			
-		// construct the command
-			char buf[64];
-			string temp;
-			/*
-			command.push_back(newTable.name);
-			command.push_back(newTable.primaryKey);
-			sprintf(buf, "%d", newTable.columnNum);
-			temp = buf;
-			command.push_back(temp);
-			*/
 
-
-			cout << sizeof(newTable);
-
+			char buf[10];
+			sprintf(buf, "%d", columnNum);
+			string count(buf);
+			vector<string>::const_iterator iter2;
+			iter2 = command.begin();
+			command.insert(iter2 + 1, count);
 		}
-		else
+		else {
 			throw "Table name empty!";
-
-		/*
-		char buf[10];
-		sprintf(buf, "%d", columnNum);
-		string count(buf);
-		vector<string>::const_iterator iter2;
-		iter2 = command.begin();
-		command.insert(iter2 + 1, count);*/
-		
-		
-		API_Main(CREATE_TABLE, command);
+			return;
+		}
+		// execute
+		API_CreateTable(command);
 	}
+
 	else if (*iter == "index") {
 
-		API_Main(CREATE_INDEX, command);
 	}
 	else {
 		throw "Only table or index can be created!";
