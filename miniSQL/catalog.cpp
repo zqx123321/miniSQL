@@ -30,17 +30,8 @@ void Catalog::CreateTable(vector<string> cmd) {
 		data += cmd.at(i) + ' ';
 	data += "*";
 
-	/*
-	ofstream fout;
-	fout.open("../catalog/0.catalog", ios::out | ios::binary);
-	cerr << strerror(errno);
-	fout << data.c_str();
-	fout.close();
-	*/
-
 	int size = data.size();
-	cout << BufferManager->WritePage(CATALOG, 0, data.c_str(), size);
-	
+	BufferManager->WritePage(CATALOG, 0, data.c_str(), size, ADD);
 	
 
 }

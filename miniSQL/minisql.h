@@ -14,6 +14,10 @@ enum fileType {
 	CATALOG, RECORD, INDEX, UNKNOWN
 };
 
+enum writeMode {
+	ADD, COVER
+};
+
 vector<string> split(const string s);
 
 struct AttrDef {

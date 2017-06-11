@@ -9,8 +9,9 @@ private:
 	bool pin;		//  if it's pinned
 	bool lastUsed;	//	if it's used the last time
 	bool dirty;		//  if it's consistent with the disk
-	char* head;	
+	unsigned int dataSize;
 	//  physical a ddr. for this page
+	char* data;
 public:
 	Page(fileType t, int o);
 	Page(const Page & orig);
@@ -25,7 +26,7 @@ public:
 	int getPageNum() { return pageList.size(); }
 	const char* readPage(fileType type, int offset); // read from buffer
 	bool WritePage(fileType type, int offset,
-		const char* source, int size);
+		const char* source, int size, writeMode mode);
 	Page& addPage(fileType type, int offset);
 private:
 	vector<string> filePath;

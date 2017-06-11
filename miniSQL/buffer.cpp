@@ -1,7 +1,7 @@
 #include "buffer.h"
 
 Buffer* BufferManager;
-const int PAGE_SIZE = 4096;
+const int PAGE_SIZE = 4092;
 const int PAGE_MAX_NUM = 30;
 
 Buffer::Buffer()
@@ -20,7 +20,11 @@ Buffer::~Buffer() {
 		if (pageList.at(i).dirty == true) {
 			fileType type = pageList.at(i).type;
 			fout.open(BufferManager->filePath.at(type), ios::out | ios::binary);
-			fout.write(pageList.at(i).head, PAGE_SIZE);
+
+			fout.seekp(pageList.at(i).offset * PAGE_SIZE, ios::end);
+			fout.write((char*)&pageList.at(i).dataSize, sizeof(unsigned int));
+			
+			fout.write(pageList.at(i).data, PAGE_SIZE);
 			pageList.at(i).dirty = false;
 		}
 	}
@@ -37,14 +41,15 @@ const char* Buffer::readPage(fileType type, int offset) {
 		break;
 	}
 	if (i == pageList.size()) {
-		return addPage(type, offset).head;
+		return addPage(type, offset).data;
 	}
 	else {
-		return pageList.at(i).head;
+		return pageList.at(i).data;
 	}
 }
 
-bool Buffer::WritePage(fileType type, int offset, const char* source, int size) {
+bool Buffer::WritePage(fileType type, int offset, 
+	const char* source, int size, writeMode mode) {
 	ofstream fout;
 
 	int i = 0;
@@ -57,7 +62,14 @@ bool Buffer::WritePage(fileType type, int offset, const char* source, int size) 
 
 	if (i == pageList.size()) {
 		Page& current = addPage(type, offset);
-		memcpy(current.head, source, size);
+		if (mode == COVER) {
+			memcpy(current.data, source, size);
+			current.dataSize = size;
+		}
+		else if (mode == ADD) {
+			memcpy(current.data + current.dataSize, source, size);
+			current.dataSize += size;
+		}
 		current.dirty = true;
 	}
 	else {
@@ -65,12 +77,22 @@ bool Buffer::WritePage(fileType type, int offset, const char* source, int size) 
 		// check if it's dirty
 		if (pageList.at(i).dirty == true) {
 			fout.seekp(offset*PAGE_SIZE, ios::end);
-			fout.write(pageList.at(i).head, PAGE_SIZE);
+			fout.write((char*)&pageList.at(i).dataSize,
+				sizeof(unsigned int));
+
+			fout.write(pageList.at(i).data, PAGE_SIZE);
 			pageList.at(i).dirty = false;
 		}
 
 		Page& current = pageList.at(i);
-		memcpy(current.head, source, size);
+		if (mode == COVER) {
+			memcpy(current.data, source, size);
+			current.dataSize = size;
+		}
+		else if (mode == ADD) {
+			memcpy(current.data + current.dataSize, source, size);
+			current.dataSize += size;
+		}
 		current.dirty = true;
 	}
 	
@@ -88,10 +110,12 @@ Page& Buffer::addPage(fileType type, int offset) {
 		if (i == PAGE_MAX_NUM) {
 			throw "All pages are pinned! Cannot allocate new page!";
 		}
+
 		if (pageList.at(i).dirty == true) {
 			fstream fout;
 			fout.seekp(offset*PAGE_SIZE, ios::end);
-			fout.write(pageList.at(i).head, PAGE_SIZE);
+			fout.write((char*)pageList.at(i).dataSize, sizeof(unsigned int));
+			fout.write(pageList.at(i).data, PAGE_SIZE);
 			pageList.at(i).dirty = false;
 		}
 		pageList.erase(pageList.begin() + i);
@@ -103,17 +127,21 @@ Page& Buffer::addPage(fileType type, int offset) {
 }
 
 Page::Page(fileType t, int o) : type(t), offset(o){
+	
 	// settings
 	lastUsed = false;
 	pin = false;
 	dirty = false;
-	head = new char[PAGE_SIZE];
-	head[0] = '\0';
+	data = new char[PAGE_SIZE];
+	data[0] = '\0';
+
 	// import the data from file
 	ifstream fin;
 	fin.open(BufferManager->filePath.at(t), ios::in | ios::binary);
+
 	fin.seekg(offset*PAGE_SIZE, ios::end);
-	fin.read(head, PAGE_SIZE);
+	fin.read((char*)&dataSize, sizeof(unsigned int));
+	fin.read(data, PAGE_SIZE);
 }
 
 Page::Page(const Page & orig) {
@@ -122,13 +150,15 @@ Page::Page(const Page & orig) {
 	pin = orig.pin;
 	lastUsed = orig.lastUsed;
 	dirty = orig.dirty;
-	head = new char[PAGE_SIZE];
+	dataSize = orig.dataSize;
+
+	data = new char[PAGE_SIZE];
 	int i = 0;
-	while (orig.head[i] != '\0')
-		head[i++] = orig.head[i];
-	head[i] = '\0';
+	while (orig.data[i] != '\0')
+		data[i++] = orig.data[i];
+	data[i] = '\0';
 }
 
 Page::~Page() {
-	delete [] head;
+	delete [] data;
 }
