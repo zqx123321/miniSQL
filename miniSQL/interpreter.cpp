@@ -83,6 +83,7 @@ opType INTERPRETER_GetOp() {
 }
 
 void INTERPRETER_Create() {
+	
 	vector<string> command;
 
 	// read in all the word
@@ -98,19 +99,22 @@ void INTERPRETER_Create() {
 	vector<string> element = split(sentence);
 	vector<string>::const_iterator iter = element.begin();
 	
+	
 	if (iter == element.end()) {
 		throw "Empty command!";
 	}
 	else if (*iter == "table") {
 		iter++;
+		int columnNum = 0;
 		if (iter != element.end()) {
 			string temp = *iter;
 			command.push_back(temp); // table name
-			iter++;
+			if (API_FindTable(temp))
+				throw "Table already exists!";
 
+			iter++;
 			bool done = false;
 			string attrName, attrType, attrType_app, unique;
-			int columnNum = 0;
 			while (1) {
 				done = false;
 				attrName = *iter;
@@ -187,6 +191,8 @@ void INTERPRETER_Create() {
 		}
 		// execute
 		API_CreateTable(command);
+		cout << "Create successfully!" << endl;
+		cout << columnNum << " row(s) affected." << endl;
 	}
 
 	else if (*iter == "index") {

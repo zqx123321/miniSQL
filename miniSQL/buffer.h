@@ -1,9 +1,7 @@
 #pragma once
 #include "minisql.h"
 
-class Page {
-	friend class Buffer;
-private:
+struct Page {
 	fileType type;	//	the file it belongs to
 	int offset;		//  page offset
 	bool pin;		//  if it's pinned
@@ -12,24 +10,33 @@ private:
 	unsigned int dataSize;
 	//  physical a ddr. for this page
 	char* data;
-public:
+
 	Page(fileType t, int o);
 	Page(const Page & orig);
 	~Page();
 };
 
-class Buffer {
-	friend class Page;
-public:
+
+struct File {
+	File(int c = 0, int r = 0, int i = 0);
+	int blockNum[3];
+	vector<int> catalogExistIndex;
+	vector<int> recordExistIndex;
+	vector<int> indexExistIndex;
+	vector<string> filePath;
+	void eraseIndex(fileType type, int offset);
+};
+
+struct Buffer {
 	Buffer();
 	~Buffer();
-	int getPageNum() { return pageList.size(); }
+	void loadAllPages();
+	void storePage(fileType type);
 	const char* readPage(fileType type, int offset); // read from buffer
 	bool WritePage(fileType type, int offset,
 		const char* source, int size, writeMode mode);
 	Page& addPage(fileType type, int offset);
-private:
-	vector<string> filePath;
 	vector<Page> pageList;
+	File* fileInfo;
 };
 

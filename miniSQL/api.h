@@ -15,3 +15,5 @@ enum opType {
 };
 
 void API_CreateTable(vector<string> cmd);
+void API_CreateIndex(vector<string> cmd);
+bool API_FindTable(string name);

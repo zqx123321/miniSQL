@@ -32,9 +32,8 @@ void Catalog::CreateTable(vector<string> cmd) {
 
 	int size = data.size();
 	BufferManager->WritePage(CATALOG, 0, data.c_str(), size, ADD);
-	
-
 }
+
 /*
 void Catalog::CreateTable(TableDef table) { 
 	
@@ -92,14 +91,32 @@ void Catalog::CreateIndex(vector<string> cmd) {
 }
 
 bool Catalog::FindTable(string temp) const {
+	
+	int pageNum = BufferManager->pageList.size();
 
-	vector<TableDef>::const_iterator iter;
-	iter = allTables.begin();
-	while (iter != allTables.end()) {
-		if (iter->name == temp)
-			return true;
-		iter++;
+	for (int i = 0; i < pageNum; i++) {
+
+		if (BufferManager->pageList.at(i).type != CATALOG)
+			continue;
+		const char* searchAddr = BufferManager
+			->readPage(CATALOG, BufferManager->pageList.at(i).offset);
+
+		int index = 0;
+		while (*(searchAddr + index) == '#') {
+			index+=2;
+			string name;
+			while (*(searchAddr + index) != ' ') {
+				name += *(searchAddr + index);
+				index++;
+			}
+			if (name == temp)
+				return true;
+			while (*(searchAddr + index) != '*')
+				index++;-
+
+			index++;
+		}
 	}
+	
 	return false;
-
 }

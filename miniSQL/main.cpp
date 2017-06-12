@@ -26,6 +26,7 @@ void TOP_Initial() {
 	RecordManager = new Record();
 	IndexManager = new Index();
 	BufferManager = new Buffer();
+	BufferManager->loadAllPages();
 }
 
 void TOP_execute() {
