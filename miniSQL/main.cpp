@@ -32,6 +32,7 @@ void TOP_Initial() {
 }
 
 void TOP_execute() {
+	INTERPRETER_Welcome();
 	INTERPRETER_Main();
 }
 

@@ -6,7 +6,6 @@
 extern Catalog* CatalogManager;
 
 void INTERPRETER_Main() {
-	INTERPRETER_Welcome();
 	opType operation = CREATE;
 	while (QUIT != operation) {
 		try {
@@ -386,5 +385,33 @@ void INTERPRETER_Drop() {
 }
 
 void INTERPRETER_Execfile() {
+	int count = 0;
+	// read in all the word
+	string word;
+	string sentence;
+	do {
+		cin >> word;
+		sentence += word + ' ';
 
+	} while (word.back() != ';');
+
+	// parse for create
+	vector<string> element = split(sentence);
+	vector<string>::const_iterator iter = element.begin();
+
+	string fileName = "../execFile/";
+	fileName += *iter;
+	ifstream fin;
+	fin.open(fileName.c_str(), ios::in);
+	if (!fin.is_open())
+		throw "File doesn't exist!";
+
+	streambuf *backup = cin.rdbuf();   // back up cin's streambuf  
+	cin.rdbuf(fin.rdbuf()); // assign file's streambuf to cin  
+	INTERPRETER_Main();
+	cin.rdbuf(backup);     // restore cin's original streambuf
+	
+	fin.close();
+	cout << "Execute successfully!" << endl;
+	cout << count << " row(s) affected." << endl;
 }

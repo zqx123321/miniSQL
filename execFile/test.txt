@@ -1,0 +1,3 @@
+select * from jzf;
+select * from jzf where age < 20 and age > 18;
+quit
