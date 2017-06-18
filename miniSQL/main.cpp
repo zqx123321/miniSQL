@@ -49,7 +49,7 @@ vector<string> split(const string s) {
 	begin = end = 0;
 	while (end < s.size()) {
 		if (s[end] == '"' || s[end] == '(' || s[end] == ')' || s[end] == ';'
-				|| s[end] == ',' || s[end] == ' ') {
+				|| s[end] == ',' || s[end] == ' ' || s[end] == '\'') {
 			if (begin <= end - 1) {
 				string temp = s.substr(begin, end - begin);
 				result.push_back(temp);
@@ -62,3 +62,145 @@ vector<string> split(const string s) {
 	}
 	return result;
 }
+
+bool Judge(string temp, string value, dataType type, string operation) {
+	bool result;
+
+	if (operation == "=") {
+		switch (type)
+		{
+		case INT:
+			int  num1,num2;
+			sscanf(temp.c_str(), "%d", &num1);
+			sscanf(value.c_str(), "%d", &num2);
+			result = num1 == num2;
+			break;
+		case CHAR:
+			result = temp == value;
+			break;
+		case FLOAT:
+			float float1, float2;
+			sscanf(temp.c_str(), "%f", &float1);
+			sscanf(value.c_str(), "%f", &float2);
+			result = float1 == float2;
+			break;
+		default:
+			break;
+		}
+	}
+	else if (operation == "<>") {
+		switch (type)
+		{
+		case INT:
+			int num1, num2;
+			sscanf(temp.c_str(), "%d", &num1);
+			sscanf(value.c_str(), "%d", &num2);
+			result = num1 != num2;
+			break;
+		case CHAR:
+			result = temp != value;
+			break;
+		case FLOAT:
+			float float1, float2;
+			sscanf(temp.c_str(), "%f", &float1);
+			sscanf(value.c_str(), "%f", &float2);
+			result = float1 != float2;
+			break;
+		default:
+			break;
+		}
+	}
+	else if (operation == "<") {
+		switch (type)
+		{
+		case INT:
+			int num1, num2;
+			sscanf(temp.c_str(), "%d", &num1);
+			sscanf(value.c_str(), "%d", &num2);
+			result = num1 < num2;
+			break;
+		case CHAR:
+			result = temp < value;
+			break;
+		case FLOAT:
+			float float1, float2;
+			sscanf(temp.c_str(), "%f", &float1);
+			sscanf(value.c_str(), "%f", &float2);
+			result = float1 < float2;
+			break;
+		default:
+			break;
+		}
+	}
+	else if (operation == ">") {
+		switch (type)
+		{
+		case INT:
+			int num1, num2;
+			sscanf(temp.c_str(), "%d", &num1);
+			sscanf(value.c_str(), "%d", &num2);
+			result = num1 > num2;
+			break;
+		case CHAR:
+			result = temp > value;
+			break;
+		case FLOAT:
+			float float1, float2;
+			sscanf(temp.c_str(), "%f", &float1);
+			sscanf(value.c_str(), "%f", &float2);
+			result = float1 > float2;
+			break;
+		default:
+			break;
+		}
+	}
+	else if (operation == "<=") {
+		switch (type)
+		{
+		case INT:
+			int num1, num2;
+			sscanf(temp.c_str(), "%d", &num1);
+			sscanf(value.c_str(), "%d", &num2);
+			result = num1 <= num2;
+			break;
+		case CHAR:
+			result = temp <= value;
+			break;
+		case FLOAT:
+			float float1, float2;
+			sscanf(temp.c_str(), "%f", &float1);
+			sscanf(value.c_str(), "%f", &float2);
+			result = float1 <= float2;
+			break;
+		default:
+			break;
+		}
+	}
+	else if (operation == ">=") {
+		switch (type)
+		{
+		case INT:
+			int num1, num2;
+			sscanf(temp.c_str(), "%d", &num1);
+			sscanf(value.c_str(), "%d", &num2);
+			result = num1 >= num2;
+			break;
+		case CHAR:
+			result = temp >= value;
+			break;
+		case FLOAT:
+			float float1, float2;
+			sscanf(temp.c_str(), "%f", &float1);
+			sscanf(value.c_str(), "%f", &float2);
+			result = float1 >= float2;
+			break;
+		default:
+			break;
+		}
+	}
+	else
+		throw "Unknown comparison!";
+
+	return result;
+}
+

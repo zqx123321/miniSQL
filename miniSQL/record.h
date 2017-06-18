@@ -5,7 +5,8 @@ class Record {
 public:
 	int Insert(RecordDef & record, int columnNum);
 	set<Location> Select(string table, 
-		int attrIndex, string operation, string value);
+		int attrIndex, dataType type,
+		string operation, string value);
 	set<Location> Select(string table);
 	void showRecord(int attrNum, set<Location> loc);
 };

@@ -62,10 +62,49 @@ void Record::showRecord(int attrNum, set<Location> loc) {
 }
 
 set<Location> Record::Select(string table,
-	int attrIndex, string operation, string value) {
+	int attrIndex, dataType type,
+	string operation, string value) {
 	set<Location> result;
 
+	int pageNum = BufferManager->pageList.size();
+	for (int i = 0; i < pageNum; i++) {
 
+		if (BufferManager->pageList.at(i).type != RECORD)
+			continue;
+		const char* data = BufferManager
+			->readPage(RECORD, BufferManager->pageList.at(i).offset);
+
+		int index = 0;
+		while (data[index] == '#') {
+			int index2 = index + 2; // skip # and space
+			string temp;
+			while (data[index2] != ' ') {
+				temp += data[index2];
+				index2++;
+			}
+			index2++;
+
+			if (temp == table) {
+				for (int j = 0; j <= attrIndex; j++) {
+					temp.clear();
+					while (data[index2] != ' ') {
+						temp += data[index2];
+						index2++;
+					}
+					index2++;
+				}
+				
+				if (Judge(temp, value, type, operation) == true) {
+					int page = i;
+					int offset = index;
+					result.insert(Location(page, offset));
+				}
+			}
+			while (data[index] != '*')
+				index++;
+			index++;
+		}
+	}
 	return result;
 }
 

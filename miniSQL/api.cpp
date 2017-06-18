@@ -45,7 +45,7 @@ int API_Select(Query & query) {
 			query.columnIndex.at(i), page, offset);
 		if (page == -1) { // No index existing
 			resLoc = RecordManager->Select(query.tableName,
-				query.columnIndex.at(i), query.operation.at(i),
+				query.columnIndex.at(i), query.type.at(i), query.operation.at(i),
 				query.value.at(i));
 		}
 		else {
@@ -55,7 +55,6 @@ int API_Select(Query & query) {
 		}
 		allLoc.push_back(resLoc);
 	}
-	
 	// intersection
 	set<Location> tempLoc = allLoc.at(0);
 	set<Location> resLoc = allLoc.at(0);
@@ -67,7 +66,6 @@ int API_Select(Query & query) {
 	}
 	// display result
 	RecordManager->showRecord(attrNum, tempLoc);
-
 	cout << endl << endl;
 	return resLoc.size();
 }

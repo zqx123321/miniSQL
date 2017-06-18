@@ -234,11 +234,9 @@ void INTERPRETER_Select() {
 	iter++;
 
 	Query newQuery(tableName);
+	newQuery.conditionNum = 0;
 
-	if (iter == element.end()) {
-		newQuery.conditionNum = 0;
-	}
-	else {
+	if (iter != element.end()) {
 		iter++; //skip where
 		do {
 			string attributeName = *iter;
@@ -268,7 +266,6 @@ void INTERPRETER_Select() {
 	count = API_Select(newQuery);
 	cout << "Select successfully!" << endl;
 	cout << count << " row(s) affected." << endl;
-	
 }
 
 void INTERPRETER_Insert() {

@@ -21,8 +21,6 @@ enum writeMode {
 	ADD, COVER
 };
 
-vector<string> split(const string s);
-
 struct AttrDef {
 	AttrDef(string name, dataType type, int width, bool unique);
 	string name;
@@ -85,5 +83,7 @@ struct Location {
 	}
 };
 
+vector<string> split(const string s);
 
+bool Judge(string temp, string value, dataType type, string operation);
 
