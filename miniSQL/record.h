@@ -9,5 +9,6 @@ public:
 		string operation, string value);
 	set<Location> Select(string table);
 	void showRecord(int attrNum, set<Location> loc);
+	void deleteRecord(set<Location> loc);
 };
  

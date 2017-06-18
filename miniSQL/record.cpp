@@ -140,3 +140,7 @@ set<Location> Record::Select(string table) {
 	return result;
 }
 
+void Record::deleteRecord(set<Location> loc) {
+
+}
+

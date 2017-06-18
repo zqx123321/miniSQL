@@ -56,16 +56,59 @@ int API_Select(Query & query) {
 		allLoc.push_back(resLoc);
 	}
 	// intersection
-	set<Location> tempLoc = allLoc.at(0);
+	set<Location>::iterator iter;
+
+	set<Location> tempLoc;
 	set<Location> resLoc = allLoc.at(0);
 	for (int i = 1; i <query.conditionNum; i++){
+		set_intersection(allLoc.at(i).begin(), allLoc.at(i).end(),
+			resLoc.begin(), resLoc.end(), inserter(tempLoc, tempLoc.begin()));
+		resLoc = tempLoc;
+		tempLoc.clear();
+	}
+	// display result
+	RecordManager->showRecord(attrNum, resLoc);
+	cout << endl << endl;
+	return resLoc.size();
+}
+
+int API_Delete(Query & query) {
+	// initialization
+	vector<set<Location>> allLoc;
+
+	// try to use all the existing indices
+	if (query.conditionNum == 0) {
+		allLoc.push_back(RecordManager->Select(query.tableName));
+	}
+	for (int i = 0; i < query.conditionNum; i++) {
+		set<Location> resLoc;
+		int page, offset;
+		CatalogManager->FindColumnIndex(query.tableName,
+			query.columnIndex.at(i), page, offset);
+		if (page == -1) { // No index existing
+			resLoc = RecordManager->Select(query.tableName,
+				query.columnIndex.at(i), query.type.at(i), query.operation.at(i),
+				query.value.at(i));
+		}
+		else {
+			resLoc = IndexManager->Select(page, offset,
+				query.columnIndex.at(i), query.operation.at(i),
+				query.value.at(i));
+		}
+		allLoc.push_back(resLoc);
+	}
+	// intersection
+	set<Location> tempLoc = allLoc.at(0);
+	set<Location> resLoc = allLoc.at(0);
+	for (int i = 1; i <query.conditionNum; i++) {
 		set_intersection(allLoc.at(i).begin(), allLoc.at(i).end(),
 			tempLoc.begin(), tempLoc.end(), inserter(resLoc, resLoc.begin()));
 		tempLoc.clear();
 		tempLoc = resLoc;
 	}
 	// display result
-	RecordManager->showRecord(attrNum, tempLoc);
+
+	RecordManager->deleteRecord(tempLoc);
 	cout << endl << endl;
 	return resLoc.size();
 }
