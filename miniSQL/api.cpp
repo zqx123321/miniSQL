@@ -110,3 +110,14 @@ int API_Delete(Query & query) {
 	RecordManager->deleteRecord(tempLoc);
 	return resLoc.size();
 }
+
+int API_Drop(string name) {
+	// drop from record
+	Query query(name);
+	query.conditionNum = 0;
+	int count = API_Delete(query);
+
+	// drop from calalog
+	CatalogManager->dropTable(name);
+	return count;
+}

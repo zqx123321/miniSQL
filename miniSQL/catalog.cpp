@@ -100,6 +100,56 @@ TableDef & Catalog::FetchTable(string name) {
 	return allTables.at(i);
 }
 
+void Catalog::dropTable(string table) {
+	int pageNum = BufferManager->pageList.size();
+	for (int i = 0; i < pageNum; i++) {
+
+		if (BufferManager->pageList.at(i).type != CATALOG)
+			continue;
+		const char* data = BufferManager
+			->readPage(CATALOG, BufferManager->pageList.at(i).offset);
+
+		int index = 0;
+		while (data[index] == '#' || data[index] == '/') {
+			if (data[index] == '/') {
+				index++;
+				while (data[index] != '/')
+					index++;
+				index++;
+				continue;
+			}
+
+			int index2 = index + 2; // skip # and space
+			string temp;
+			while (data[index2] != ' ') {
+				temp += data[index2];
+				index2++;
+			}
+			if (temp == table) {
+				char* writeData = new char[strlen(data)];
+				memset(writeData, 0, strlen(data));
+				strcpy(writeData, data);
+				writeData[index] = '/';
+				while (writeData[index] != '*')
+					index++;
+				writeData[index] = '/';
+
+				BufferManager->WritePage(CATALOG, BufferManager->pageList.at(i).offset,
+					writeData, strlen(writeData), COVER);
+			}
+			while (data[index] != '*')
+				index++;
+			index++;
+		}
+	}
+
+	int i;
+	for (i = 0; i < allTables.size(); i++)
+		if (allTables.at(i).name == table)
+			break;
+	allTables.erase(allTables.begin() + i);
+}
+
 void Catalog::LoadAllTables() {
 	int pageNum = BufferManager->pageList.size();
 

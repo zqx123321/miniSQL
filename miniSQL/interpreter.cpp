@@ -16,7 +16,6 @@ void INTERPRETER_Main() {
 			case CREATE:	INTERPRETER_Create();	break;
 			case SELECT:	INTERPRETER_Select();	break;
 			case INSERT:	INTERPRETER_Insert();	break;
-			case UPDATE:	INTERPRETER_Update();	break;
 			case DELETE:	INTERPRETER_Delete();	break;
 			case DROP:		INTERPRETER_Drop();		break;
 			case EXECFILE:	INTERPRETER_Execfile(); break;
@@ -76,8 +75,6 @@ opType INTERPRETER_GetOp() {
 		return SELECT;
 	else if (cmd == "insert")
 		return INSERT;
-	else if (cmd == "update")
-		return UPDATE;
 	else if (cmd == "delete")
 		return DELETE;
 	else if (cmd == "drop")
@@ -301,10 +298,6 @@ void INTERPRETER_Insert() {
 	cout << count << " row(s) affected." << endl;
 }
 
-void INTERPRETER_Update() {
-
-}
-
 void INTERPRETER_Delete() {
 	// read in all the word
 	string word;
@@ -361,7 +354,35 @@ void INTERPRETER_Delete() {
 }
 
 void INTERPRETER_Drop() {
+	string word;
+	string sentence;
+	do {
+		cin >> word;
+		sentence += word + ' ';
 
+	} while (word.back() != ';');
+
+	// parse for create
+	vector<string> element = split(sentence);
+	vector<string>::const_iterator iter = element.begin();
+
+	if (iter == element.end()) {
+		throw "Empty command!";
+	}
+	else if (*iter == "table") {
+		string name;
+		iter++;
+		if (iter != element.end()) {
+			string name = *iter;
+			if (API_FindTable(name) == false)
+				throw "Table doesn't exist!";
+
+			int count = API_Drop(name);
+			cout << "Drop successfully!" << endl;
+			cout << count << " row(s) affected." << endl;
+		}
+	}
+			
 }
 
 void INTERPRETER_Execfile() {

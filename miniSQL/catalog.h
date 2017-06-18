@@ -8,6 +8,7 @@ public:
 
 	bool FindTable(string name) const;
 	TableDef & FetchTable(string name);
+	void dropTable(string name);
 
 	void LoadAllTables();
 

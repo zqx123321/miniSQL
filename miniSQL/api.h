@@ -5,13 +5,10 @@ enum opType {
 	CREATE,
 	SELECT,
 	INSERT,
-	UPDATE,
 	DELETE,
 	DROP,
 	EXECFILE,
 	QUIT,
-	CREATE_TABLE,
-	CREATE_INDEX
 };
 
 void API_CreateTable(TableDef & table);
@@ -20,6 +17,7 @@ bool API_FindTable(string name);
 int API_Insert(RecordDef & record);
 int API_Select(Query & query);
 int API_Delete(Query & query);
+int API_Drop(string name);
 
 int API_FindColumnIndex(string table, string attrbute);
 dataType API_FindColumnType(string table, string attrbute);
