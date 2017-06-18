@@ -1,4 +1,3 @@
-//#define _CRT_SECURE_NO_WARNINGS
 #include "minisql.h"
 #include "interpreter.h"
 #include "buffer.h"
@@ -24,7 +23,6 @@ int main() {
 void TOP_Initial() {
 	BufferManager = new Buffer();
 	BufferManager->loadAllPages();
-
 	CatalogManager = new Catalog();
 	CatalogManager->LoadAllTables();
 

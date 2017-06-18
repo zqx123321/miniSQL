@@ -20,3 +20,5 @@ NodeDef::NodeDef(bool isLeaf, bool isRoot,
 	int fatherPage, int fatherOffset, int keyNum)
 	: isLeaf(isLeaf), isRoot(isRoot), fatherPage(fatherPage),
 	fatherOffset(fatherOffset), keyNum(keyNum) {}
+
+Query::Query(string t) : tableName(t) {}

@@ -47,7 +47,7 @@ void Buffer::loadAllPages() {
 void Buffer::storePage(fileType type) {
 
 	ofstream fout;
-	for (int i = 0; i < pageList.size(); i++) {
+	for (unsigned int i = 0; i < pageList.size(); i++) {
 		if (pageList.at(i).type != type)
 			continue;
 
@@ -72,6 +72,7 @@ const char* Buffer::readPage(fileType type, int offset) {
 		if (pageList.at(i).type == type &&
 			pageList.at(i).offset == offset)
 		break;
+		i++;
 	}
 	if (i == pageList.size()) {
 		return addPage(type, offset).data;
@@ -84,15 +85,14 @@ const char* Buffer::readPage(fileType type, int offset) {
 bool Buffer::WritePage(fileType type, int offset, 
 	const char* source, int size, writeMode mode) {
 	ofstream fout;
-
 	int i = 0;
 	int pageNum = pageList.size();
 	while (i < pageNum) {
 		if (pageList.at(i).type == type &&
 			pageList.at(i).offset == offset)
 		break;
+		i++;
 	}
-
 	// if not found in the memory
 	if (i == pageList.size()) {
 		Page& current = addPage(type, offset);
@@ -193,7 +193,7 @@ Page::Page(const Page & orig) {
 	dataSize = orig.dataSize;
 	data = new char[PAGE_SIZE];
 
-	int i = 0;
+	unsigned int i = 0;
 	while (i < dataSize)
 		data[i++] = orig.data[i];
 }
@@ -212,7 +212,7 @@ File::File(int c, int r, int i) {
 }
 
 void File::eraseIndex(fileType type, int offset) {
-	int j;
+	unsigned int j;
 	switch (type) {
 	case CATALOG:
 		for (j = 0; j < catalogExistIndex.size(); j++)

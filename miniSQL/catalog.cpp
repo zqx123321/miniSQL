@@ -82,11 +82,13 @@ void Catalog::CreateTable(TableDef & table) {
 
 bool Catalog::FindTable(string name) const{
 	bool found = false;
-	for (int i = 0; i < allTables.size(); i++)
+	for (int i = 0; i < allTables.size(); i++) {
 		if (allTables.at(i).name == name) {
 			found = true;
 			break;
 		}
+	}
+		
 	return found;
 }
 
@@ -97,7 +99,6 @@ TableDef & Catalog::FetchTable(string name) {
 			break;
 	return allTables.at(i);
 }
-
 
 void Catalog::LoadAllTables() {
 	int pageNum = BufferManager->pageList.size();
@@ -112,7 +113,7 @@ void Catalog::LoadAllTables() {
 		int index = 0;
 		while (*(searchAddr + index) == '#') {
 			string rawData;
-			index++;
+			index ++;
 			while (*(searchAddr + index) != '*') {
 				rawData += *(searchAddr + index);
 				index++;
@@ -122,9 +123,11 @@ void Catalog::LoadAllTables() {
 			string tableName = splitData.at(0);
 			string primaryKey = splitData.at(1);
 			TableDef newTable(tableName, 0);
-
+			newTable.primaryKey = primaryKey;
 			int columnNum;
 			sscanf(splitData.at(2).c_str(), "%d", &columnNum);
+			newTable.columnNum = columnNum;
+
 			int iter = 3;
 			for (int j = 0; j < columnNum; j++) {
 				string attrName;
@@ -175,7 +178,51 @@ void Catalog::LoadAllTables() {
 	}
 }
 
-/*bool Catalog::FindTable(string temp) const {
+int Catalog::FindColumnNum(string table, string attribute) {
+	TableDef & SearchTable = FetchTable(table);
+	int size = SearchTable.attrList.size();
+	int i;
+	for (i = 0; i < size; i++)
+		if (SearchTable.attrList.at(i).name == attribute)
+			return i;
 	
-	
-}*/
+	throw "Attribute doesn't exist!";
+}
+
+dataType Catalog::FindColumnType(string table, string attribute) {
+	TableDef & SearchTable = FetchTable(table);
+	int size = SearchTable.attrList.size();
+	int i;
+	for (i = 0; i < size; i++)
+		if (SearchTable.attrList.at(i).name == attribute)
+			return SearchTable.attrList.at(i).type;
+}
+
+int Catalog::showHeader(Query & query) {
+	TableDef & SearchTable = FetchTable(query.tableName);
+	int count = SearchTable.attrList.size();
+	cout << endl;
+	cout << left;
+	for (int i = 0; i < count; i++) {
+		cout << setw(12) << SearchTable.attrList.at(i).name;
+		if (i != count - 1)
+			cout << '|';
+	}
+	cout << endl;
+	for (int i = 0; i < count*13; i++) {
+		cout << '-';
+	}
+	return count;
+}
+
+void Catalog::FindColumnIndex(string table, int colNum, int & page, int & offset) {
+	TableDef & searchTable = FetchTable(table);
+	if (searchTable.attrList.at(colNum).hasIndex == true) {
+		page = searchTable.attrList.at(colNum).indexPage;
+		offset = page = searchTable.attrList.at(colNum).indexOffset;
+	}
+	else {
+		page = -1;
+		offset = -1;
+	}
+}

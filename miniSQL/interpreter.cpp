@@ -213,11 +213,95 @@ void INTERPRETER_Create() {
 }
 
 void INTERPRETER_Select() {
+	// read in all the word
+	string word;
+	string sentence;
+	do {
+		cin >> word;
+		sentence += word + ' ';
 
+	} while (word.back() != ';');
+
+	// parse for create
+	vector<string> element = split(sentence);
+	vector<string>::const_iterator iter = element.begin();
+
+	iter++; // skip *
+	iter++; // skip from
+	string tableName = *iter;
+	if (API_FindTable(tableName) == false)
+		throw "Table doesn't exist!";
+	iter++;
+
+	Query newQuery(tableName);
+
+	if (iter == element.end()) {
+		newQuery.conditionNum = 0;
+	}
+	else {
+		iter++; //skip where
+		do {
+			string attributeName = *iter;
+			
+			int index = API_FindColumnIndex(tableName, attributeName);
+			newQuery.columnIndex.push_back(index);
+			iter++;
+
+			dataType t = API_FindColumnType(tableName, attributeName);
+			newQuery.type.push_back(t);
+
+			string operation = *iter;
+			newQuery.operation.push_back(operation);
+			*iter++;
+
+			string value = *iter;
+			newQuery.value.push_back(value);
+			iter++;
+
+			newQuery.conditionNum++;
+			if (iter != element.end() && *iter == "and")
+				iter++;
+		} while (iter != element.end());
+	}
+
+	int count;
+	count = API_Select(newQuery);
+	cout << "Select successfully!" << endl;
+	cout << count << " row(s) affected." << endl;
+	
 }
 
 void INTERPRETER_Insert() {
+	string word;
+	string sentence;
+	do {
+		cin >> word;
+		sentence += word + ' ';
 
+	} while (word.back() != ';');
+
+	// parse for create
+	vector<string> element = split(sentence);
+	vector<string>::const_iterator iter = element.begin();
+
+	iter++; // skip into
+	string tableName = *iter;
+	iter++; // skip value/values
+	iter++;
+	if (API_FindTable(tableName) == false)
+		throw "Table doesn't exist!";
+
+	RecordDef newRecord(tableName);
+	while (iter != element.end()) {
+		string temp = *iter;
+		newRecord.value.push_back(temp);
+		iter++;
+	}
+
+	int count;
+	count = API_Insert(newRecord);
+	cout << "Insert successfully!" << endl;
+	cout << count << " row(s) affected." << endl;
 }
 
 void INTERPRETER_Update() {

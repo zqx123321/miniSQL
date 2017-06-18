@@ -1,8 +1,12 @@
 #pragma once
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <string>
+#include <set>
+#include <algorithm>
+#include <iterator>
 using namespace std;
 
 enum dataType {
@@ -60,6 +64,25 @@ struct NodeDef {
 	vector<Key> allKeys;
 	NodeDef(bool isLeaf, bool isRoot, 
 		int fatherPage, int fatherOffset, int keyNum);
+};
+
+struct Query {
+	Query(string t);
+	string tableName;
+	int conditionNum;
+	vector<int> columnIndex;
+	vector<dataType> type;
+	vector<string> operation;
+	vector<string> value;
+};
+
+struct Location {
+	Location(int p, int o) : page(p), offset(o) {}
+	int page;
+	int offset;
+	bool operator<(const Location & a) const{
+		return page < a.page || offset < a.offset;
+	}
 };
 
 
