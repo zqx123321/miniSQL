@@ -70,7 +70,7 @@ const char* Buffer::readPage(fileType type, int offset) {
 	int pageNum = pageList.size();
 	while (i < pageNum) {
 		if (pageList.at(i).type == type &&
-			pageList.at(i).offset == offset);
+			pageList.at(i).offset == offset)
 		break;
 	}
 	if (i == pageList.size()) {

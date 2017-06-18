@@ -10,7 +10,7 @@ void INTERPRETER_Main() {
 	opType operation = CREATE;
 	while (QUIT != operation) {
 		try {
-			cout << ">>";
+			cout << ">> ";
 			operation = INTERPRETER_GetOp();
 			switch (operation) {
 			case CREATE:	INTERPRETER_Create();	break;
@@ -25,11 +25,19 @@ void INTERPRETER_Main() {
 			}
 		}
 		catch (const char* errorMsg) {
+			INTERPRETER_NewLine();
 			cerr << "Error: ";
 			cerr << errorMsg << endl;
 		}
 		cout << endl;
 	}
+}
+
+void INTERPRETER_NewLine() {
+	char temp;
+	do {
+		cin.get(temp);
+	} while (temp != '\n');
 }
 
 void INTERPRETER_Welcome() {
@@ -84,8 +92,6 @@ opType INTERPRETER_GetOp() {
 
 void INTERPRETER_Create() {
 	
-	vector<string> command;
-
 	// read in all the word
 	string word;
 	string sentence;
@@ -99,23 +105,27 @@ void INTERPRETER_Create() {
 	vector<string> element = split(sentence);
 	vector<string>::const_iterator iter = element.begin();
 	
-	
 	if (iter == element.end()) {
 		throw "Empty command!";
 	}
 	else if (*iter == "table") {
+		string name;
 		iter++;
-		int columnNum = 0;
 		if (iter != element.end()) {
-			string temp = *iter;
-			command.push_back(temp); // table name
-			if (API_FindTable(temp))
+			string name = *iter;
+			if (API_FindTable(name))
 				throw "Table already exists!";
-
 			iter++;
+
+			TableDef newTable(name, 0);
 			bool done = false;
-			string attrName, attrType, attrType_app, unique;
+
 			while (1) {
+				string attrName, attrType;
+				int attrWidth;
+				dataType type;
+				bool isUnique = false;
+
 				done = false;
 				attrName = *iter;
 				if (attrName == "primary")
@@ -130,29 +140,34 @@ void INTERPRETER_Create() {
 					break;
 				}
 				if (attrType == "char") {
+					type = CHAR;
 					iter++;
 					if (iter == element.end())
 						break;
-					else
-						attrType_app = *iter;
+					else {
+						string temp = *iter;
+						attrWidth = atoi(temp.c_str());
+					}
 				}
-				else
-					attrType_app = "0";
+				else if (attrType == "int") {
+					type = INT;
+					attrWidth = sizeof(int);
+				}
+				else {
+					type = FLOAT;
+					attrWidth = sizeof(float);
+				}
 				iter++;
 
 				if (iter != element.end() && *iter == "unique") {
-					unique = "1";
+					isUnique = true;
 					iter++;
 				}
-				else
-					unique = "0";
-				command.push_back(attrName);
-				command.push_back(attrType);
-				command.push_back(attrType_app);
-				command.push_back(unique);
-				columnNum++;
-				done = true;
 
+				newTable.attrList.push_back(AttrDef(attrName, type, attrWidth,
+					isUnique));
+				newTable.columnNum++;
+				done = true;
 				if (iter == element.end() || *iter == "primary")
 					break;
 			}
@@ -170,30 +185,23 @@ void INTERPRETER_Create() {
 					if (iter == element.end())
 						done = false;
 					else {
-						string priKey = *iter;
-						command.push_back(priKey);
+						newTable.primaryKey = *iter;
 					}
 				}
 			}
 			if (done == false)
 				throw "Information is not complete enough to create a table!";
 
-			char buf[10];
-			sprintf(buf, "%d", columnNum);
-			string count(buf);
-			vector<string>::const_iterator iter2;
-			iter2 = command.begin();
-			command.insert(iter2 + 1, count);
+			API_CreateTable(newTable);
+			cout << "Create successfully!" << endl;
+			cout << newTable.columnNum << " row(s) affected." << endl;
 		}
 		else {
 			throw "Table name empty!";
 			return;
 		}
-		// execute
-		API_CreateTable(command);
-		cout << "Create successfully!" << endl;
-		cout << columnNum << " row(s) affected." << endl;
 	}
+		
 
 	else if (*iter == "index") {
 
@@ -201,6 +209,7 @@ void INTERPRETER_Create() {
 	else {
 		throw "Only table or index can be created!";
 	}
+
 }
 
 void INTERPRETER_Select() {

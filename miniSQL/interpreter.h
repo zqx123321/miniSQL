@@ -3,6 +3,7 @@
 enum opType;
 
 opType INTERPRETER_GetOp();
+void INTERPRETER_NewLine();
 void INTERPRETER_Welcome();
 void INTERPRETER_Main();
 void INTERPRETER_Create();
@@ -13,5 +14,3 @@ void INTERPRETER_Delete();
 void INTERPRETER_Drop();
 void INTERPRETER_Execfile();
 
-extern struct AttrDef;
-extern struct TableDef;

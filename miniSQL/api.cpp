@@ -3,9 +3,8 @@
 
 extern Catalog* CatalogManager;
 
-void API_CreateTable(vector<string> cmd) {
-	CatalogManager->CreateTable(cmd);
-	CatalogManager->CreateIndex(cmd);
+void API_CreateTable(TableDef & table) {
+	CatalogManager->CreateTable(table);
 }
 
 bool API_FindTable(string name) {

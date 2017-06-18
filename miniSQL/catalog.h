@@ -1,24 +1,16 @@
 #pragma once
-#include <vector>
-#include <string>
 #include "minisql.h"
 using namespace std;
 
-class IndexDef {
-public:
-	IndexDef(string t, string a);
-private:
-	string tableName;
-	string attrName;
-};
-
 class Catalog {
 public:
-	void CreateTable(vector<string> cmd);
-	void CreateIndex(vector<string> cmd);
-	bool FindTable(string temp) const;
+	void CreateTable(TableDef & table);
+
+
+	bool FindTable(string name) const;
+	TableDef & FetchTable(string name);
+	void LoadAllTables();
 private:
 	vector<TableDef> allTables;
-	vector<IndexDef> allIndexes;
 };
 

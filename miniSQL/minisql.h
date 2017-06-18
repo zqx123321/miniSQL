@@ -3,7 +3,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-
 using namespace std;
 
 enum dataType {
@@ -18,24 +17,50 @@ enum writeMode {
 	ADD, COVER
 };
 
-
 vector<string> split(const string s);
 
 struct AttrDef {
-	AttrDef(string n, dataType d, int w, bool u, bool k);
+	AttrDef(string name, dataType type, int width, bool unique);
 	string name;
 	dataType type;
 	int width;
 	bool unique;
-	bool isKey;
+	bool hasIndex;
+	int indexPage;
+	int indexOffset;
 };
 
 struct TableDef {
-	TableDef(string n, int c);
+	TableDef(string name, int columnNum);
 	string name;
 	string primaryKey;
 	int columnNum;
 	vector<AttrDef> attrList;
 };
+
+struct RecordDef {
+	RecordDef(string tableName);
+	string tableName;
+	vector<string> value;
+};
+
+struct Key {
+	int page;
+	int offset;
+	string value;
+	Key(int page, int offset, string value);
+};
+
+struct NodeDef {
+	bool isLeaf;
+	bool isRoot;
+	int fatherPage;
+	int fatherOffset;
+	int keyNum;
+	vector<Key> allKeys;
+	NodeDef(bool isLeaf, bool isRoot, 
+		int fatherPage, int fatherOffset, int keyNum);
+};
+
 
 
