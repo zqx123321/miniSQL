@@ -41,7 +41,7 @@ void Buffer::loadAllPages() {
 		}
 		fin.close();
 	}
-
+	
 }
 	
 void Buffer::storePage(fileType type) {
@@ -131,7 +131,6 @@ bool Buffer::WritePage(fileType type, int offset,
 			current.dataSize += size;
 		}
 		
-		
 		current.dirty = true;
 	}
 
@@ -166,14 +165,14 @@ Page& Buffer::addPage(fileType type, int offset) {
 	return pageList.back();
 }
 
-Page::Page(fileType t, int o) : type(t), offset(o){
-	
+Page::Page(fileType t, int o) : type(t), offset(o) {
+
 	// settings
 	lastUsed = false;
 	pin = false;
 	dirty = false;
 	data = new char[PAGE_SIZE];
-	data[0] = '\0';
+	memset(data, 0, PAGE_SIZE);
 
 	// import the data from file
 	ifstream fin;
@@ -181,7 +180,7 @@ Page::Page(fileType t, int o) : type(t), offset(o){
 	
 	fin.seekg(offset*PAGE_SIZE + 4);
 	fin.read((char*)&dataSize, sizeof(unsigned int));
-	fin.read(data, PAGE_SIZE);
+	fin.read(data, dataSize);
 }
 
 Page::Page(const Page & orig) {
@@ -192,6 +191,7 @@ Page::Page(const Page & orig) {
 	dirty = orig.dirty;
 	dataSize = orig.dataSize;
 	data = new char[PAGE_SIZE];
+	memset(data, 0, PAGE_SIZE);
 
 	unsigned int i = 0;
 	while (i < dataSize)

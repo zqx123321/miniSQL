@@ -73,9 +73,8 @@ int API_Select(Query & query) {
 }
 
 int API_Delete(Query & query) {
-	// initialization
-	vector<set<Location>> allLoc;
 
+	vector<set<Location>> allLoc;
 	// try to use all the existing indices
 	if (query.conditionNum == 0) {
 		allLoc.push_back(RecordManager->Select(query.tableName));
@@ -109,6 +108,5 @@ int API_Delete(Query & query) {
 	// display result
 
 	RecordManager->deleteRecord(tempLoc);
-	cout << endl << endl;
 	return resLoc.size();
 }

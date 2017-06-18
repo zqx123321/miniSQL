@@ -319,7 +319,6 @@ void INTERPRETER_Delete() {
 	vector<string> element = split(sentence);
 	vector<string>::const_iterator iter = element.begin();
 
-	iter++; // skip *
 	iter++; // skip from
 	string tableName = *iter;
 	if (API_FindTable(tableName) == false)

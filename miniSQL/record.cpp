@@ -41,7 +41,7 @@ void Record::showRecord(int attrNum, set<Location> loc) {
 		int index = iter->offset;
 		string temp;
 
-		index += 2; // skip * and space
+		index += 2; // skip # and space
 		while (data[index] != ' ') {	// skip table name
 			index++;
 		}
@@ -75,7 +75,14 @@ set<Location> Record::Select(string table,
 			->readPage(RECORD, BufferManager->pageList.at(i).offset);
 
 		int index = 0;
-		while (data[index] == '#') {
+		while (data[index] == '#' || data[index] == '/') {
+			if (data[index] == '/') {
+				index++;
+				while (data[index] != '/')
+					index++;
+				index++;
+				continue;
+			}
 			int index2 = index + 2; // skip # and space
 			string temp;
 			while (data[index2] != ' ') {
@@ -120,7 +127,14 @@ set<Location> Record::Select(string table) {
 			->readPage(RECORD, BufferManager->pageList.at(i).offset);
 
 		int index = 0;
-		while (data[index] == '#') {
+		while (data[index] == '#' || data[index] == '/') {
+			if (data[index] == '/') {
+				index++;
+				while (data[index] != '/')
+					index++;
+				index++;
+				continue;
+			}
 			int index2 = index + 2; // skip # and space
 			string temp;
 			while (data[index2] != ' ') {
@@ -141,6 +155,24 @@ set<Location> Record::Select(string table) {
 }
 
 void Record::deleteRecord(set<Location> loc) {
+	set<Location>::iterator iter;
+	for (iter = loc.begin(); iter != loc.end(); iter++) {
+		const char* data = BufferManager->readPage
+		(RECORD, BufferManager->pageList.at(iter->page).offset);
 
+		int index = iter->offset;
+		string temp;
+
+		char* writeData = new char[strlen(data)];
+		memset(writeData, 0, strlen(data));
+		strcpy(writeData, data);
+		writeData[index] = '/';
+		while (writeData[index] != '*')
+			index++;
+		writeData[index] = '/';
+
+		BufferManager->WritePage(RECORD, BufferManager->pageList.at(iter->page).offset,
+			writeData, strlen(writeData), COVER);
+	}
 }
 

@@ -109,7 +109,6 @@ void Catalog::LoadAllTables() {
 			continue;
 		const char* searchAddr = BufferManager
 			->readPage(CATALOG, BufferManager->pageList.at(i).offset);
-
 		int index = 0;
 		while (*(searchAddr + index) == '#') {
 			string rawData;
