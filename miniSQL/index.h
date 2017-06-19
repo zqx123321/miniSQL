@@ -3,10 +3,14 @@
 
 class Index {
 public:
-	set<Location> Select(int page, int offset,
-		int columnIndex, string operation,
-		string value);
+	void LoadAllIndices();
+	bool findBPlus(string name);
+	indexInfo dropBPlus(string name);
+	set<Location> Select(string tableName, int index,
+		dataType type, string value);
+	Location BuildBPlus(string name, TableDef & table, int index,
+			vector<AidedNode> nodeList);
 private:
-
+	vector<BPlus> allIndices;
 };
 

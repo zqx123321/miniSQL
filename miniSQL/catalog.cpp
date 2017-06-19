@@ -6,9 +6,9 @@ const int PAGE_SIZE = 4092;
 Catalog* CatalogManager;
 extern Buffer* BufferManager;
 
-void Catalog::CreateTable(TableDef & table) {
-
-	allTables.push_back(table);
+void Catalog::CreateTable(TableDef & table, int mode) {
+	if(mode == 1)
+		allTables.push_back(table);
 
 	string data;
 	data += "# ";
@@ -80,6 +80,26 @@ void Catalog::CreateTable(TableDef & table) {
 	BufferManager->WritePage(CATALOG, 0, data.c_str(), size, ADD);
 }
 
+void Catalog::CreateIndex(TableDef & table, int colIndex,Location root) {
+	table.attrList.at(colIndex).hasIndex = true;
+	table.attrList.at(colIndex).indexOffset = root.offset;
+	table.attrList.at(colIndex).indexPage = root.page;
+	
+	dropTable(table.name, 0);
+	CreateTable(table, 0);
+}
+
+void Catalog::dropIndex(indexInfo info) {
+	TableDef & table = FetchTable(info.tableName);
+	int colIndex = info.index;
+	table.attrList.at(colIndex).hasIndex = false;
+	table.attrList.at(colIndex).indexOffset = -1;
+	table.attrList.at(colIndex).indexPage = -1;
+
+	dropTable(table.name, 0);
+	CreateTable(table, 0);
+}
+
 bool Catalog::FindTable(string name) const{
 	bool found = false;
 	for (int i = 0; i < allTables.size(); i++) {
@@ -100,7 +120,7 @@ TableDef & Catalog::FetchTable(string name) {
 	return allTables.at(i);
 }
 
-void Catalog::dropTable(string table) {
+void Catalog::dropTable(string table, int mode) {
 	int pageNum = BufferManager->pageList.size();
 	for (int i = 0; i < pageNum; i++) {
 
@@ -143,11 +163,13 @@ void Catalog::dropTable(string table) {
 		}
 	}
 
-	int i;
-	for (i = 0; i < allTables.size(); i++)
-		if (allTables.at(i).name == table)
-			break;
-	allTables.erase(allTables.begin() + i);
+	if (mode == 1) {
+		int i;
+		for (i = 0; i < allTables.size(); i++)
+			if (allTables.at(i).name == table)
+				break;
+		allTables.erase(allTables.begin() + i);
+	}
 }
 
 void Catalog::LoadAllTables() {
@@ -160,7 +182,14 @@ void Catalog::LoadAllTables() {
 		const char* searchAddr = BufferManager
 			->readPage(CATALOG, BufferManager->pageList.at(i).offset);
 		int index = 0;
-		while (*(searchAddr + index) == '#') {
+		while (searchAddr[index] == '#' || searchAddr[index] == '/') {
+			if (searchAddr[index] == '/') {
+				index++;
+				while (searchAddr[index] != '/')
+					index++;
+				index++;
+				continue;
+			}
 			string rawData;
 			index ++;
 			while (*(searchAddr + index) != '*') {
@@ -264,14 +293,7 @@ int Catalog::showHeader(Query & query) {
 	return count;
 }
 
-void Catalog::FindColumnIndex(string table, int colNum, int & page, int & offset) {
+bool Catalog::FindIndex(string table, int colNum) {
 	TableDef & searchTable = FetchTable(table);
-	if (searchTable.attrList.at(colNum).hasIndex == true) {
-		page = searchTable.attrList.at(colNum).indexPage;
-		offset = page = searchTable.attrList.at(colNum).indexOffset;
-	}
-	else {
-		page = -1;
-		offset = -1;
-	}
+	return searchTable.attrList.at(colNum).hasIndex;
 }

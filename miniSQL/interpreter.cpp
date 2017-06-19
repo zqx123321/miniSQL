@@ -200,7 +200,45 @@ void INTERPRETER_Create() {
 		
 
 	else if (*iter == "index") {
+		iter++;
+		if (iter == element.end())
+			throw "Empty command!";
 
+		string indexName = *iter;
+		if (API_FindIndex(indexName) == true)
+			throw "index already exists!";
+
+		iter++; 
+		if (iter == element.end())
+			throw "Incomplete command!";
+
+		iter++; // skip on
+		if (iter != element.end()) {
+			string tableName = *iter;
+			if (API_FindTable(tableName) == false)
+				throw "Table doesn't exists!";
+			iter++;
+			string attrName = *iter;
+
+			TableDef & table = API_FetchTable(tableName);
+			int index = API_FindColumnIndex(tableName, attrName);
+
+			if (table.attrList.at(index).unique == false)
+				throw "Cannot create since the attribute is not unique!";
+			if (table.attrList.at(index).hasIndex == true) {
+				API_DropIndex(table.attrList.at(index).name);
+			}
+
+			int count;
+			count = API_CreateIndex(indexName, table, index);
+			table.attrList.at(index).hasIndex = true;
+			cout << "Create successfully!" << endl;
+			cout << count << " row(s) affected." << endl;
+		}
+		else {
+			throw "Table name empty!";
+			return;
+		}
 	}
 	else {
 		throw "Only table or index can be created!";
@@ -218,7 +256,7 @@ void INTERPRETER_Select() {
 
 	} while (word.back() != ';');
 
-	// parse for create
+	// parse for select
 	vector<string> element = split(sentence);
 	vector<string>::const_iterator iter = element.begin();
 
@@ -273,7 +311,7 @@ void INTERPRETER_Insert() {
 
 	} while (word.back() != ';');
 
-	// parse for create
+	// parse for insert
 	vector<string> element = split(sentence);
 	vector<string>::const_iterator iter = element.begin();
 
@@ -307,7 +345,7 @@ void INTERPRETER_Delete() {
 
 	} while (word.back() != ';');
 
-	// parse for create
+	// parse for delete
 	vector<string> element = split(sentence);
 	vector<string>::const_iterator iter = element.begin();
 
@@ -381,6 +419,21 @@ void INTERPRETER_Drop() {
 			cout << count << " row(s) affected." << endl;
 		}
 	}
+	else if (*iter == "index") {
+		string name;
+		iter++;
+		if (iter != element.end()) {
+			string name = *iter;
+			if (API_FindIndex(name) == false)
+				throw "Index doesn't exist!";
+
+			int count = API_DropIndex(name);
+			cout << "Drop successfully!" << endl;
+			cout << count << " row(s) affected." << endl;
+		}
+		else
+			throw "Empty command!";
+	}
 			
 }
 
@@ -412,6 +465,4 @@ void INTERPRETER_Execfile() {
 	cin.rdbuf(backup);     // restore cin's original streambuf
 	
 	fin.close();
-	cout << "Execute successfully!" << endl;
-	cout << count << " row(s) affected." << endl;
 }

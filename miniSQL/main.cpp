@@ -23,12 +23,11 @@ int main() {
 void TOP_Initial() {
 	BufferManager = new Buffer();
 	BufferManager->loadAllPages();
-
 	CatalogManager = new Catalog();
 	CatalogManager->LoadAllTables();
 	RecordManager = new Record();
 	IndexManager = new Index();
-	
+	IndexManager->LoadAllIndices();
 }
 
 void TOP_execute() {

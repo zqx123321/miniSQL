@@ -9,11 +9,29 @@ extern Record* RecordManager;
 extern Index* IndexManager;
 
 void API_CreateTable(TableDef & table) {
-	CatalogManager->CreateTable(table);
+	CatalogManager->CreateTable(table, 1);
+}
+
+int API_CreateIndex(string indexName, TableDef & table, int index) {
+	Location rootLoc(-1,-1);
+	vector<AidedNode> nodeList = RecordManager->SelectForAidedNode(table.name, index);
+	rootLoc = IndexManager->BuildBPlus(indexName, table, index, nodeList);
+	CatalogManager->CreateIndex(table, index, rootLoc);
+	return nodeList.size();
+}
+
+int API_DropIndex(string name) {
+	indexInfo info = IndexManager->dropBPlus(name);
+	CatalogManager->dropIndex(info);
+	return 0;
 }
 
 bool API_FindTable(string name) {
 	return CatalogManager->FindTable(name);
+}
+
+TableDef & API_FetchTable(string table) {
+	return CatalogManager->FetchTable(table);
 }
 
 int API_Insert(RecordDef & record) {
@@ -41,16 +59,17 @@ int API_Select(Query & query) {
 	for (int i = 0; i < query.conditionNum; i++) {
 		set<Location> resLoc;
 		int page, offset;
-		CatalogManager->FindColumnIndex(query.tableName, 
-			query.columnIndex.at(i), page, offset);
-		if (page == -1) { // No index existing
-			resLoc = RecordManager->Select(query.tableName,
-				query.columnIndex.at(i), query.type.at(i), query.operation.at(i),
+		bool found;
+		found = CatalogManager->FindIndex(query.tableName,
+			query.columnIndex.at(i));
+		if (found && query.operation.at(i) == "=") { // If index can help
+			resLoc = IndexManager->Select(query.tableName,
+				query.columnIndex.at(i), query.type.at(i),
 				query.value.at(i));
 		}
 		else {
-			resLoc = IndexManager->Select(page, offset,
-				query.columnIndex.at(i), query.operation.at(i),
+			resLoc = RecordManager->Select(query.tableName,
+				query.columnIndex.at(i), query.type.at(i), query.operation.at(i),
 				query.value.at(i));
 		}
 		allLoc.push_back(resLoc);
@@ -82,16 +101,17 @@ int API_Delete(Query & query) {
 	for (int i = 0; i < query.conditionNum; i++) {
 		set<Location> resLoc;
 		int page, offset;
-		CatalogManager->FindColumnIndex(query.tableName,
-			query.columnIndex.at(i), page, offset);
-		if (page == -1) { // No index existing
-			resLoc = RecordManager->Select(query.tableName,
-				query.columnIndex.at(i), query.type.at(i), query.operation.at(i),
+		bool found;
+		found = CatalogManager->FindIndex(query.tableName,
+			query.columnIndex.at(i));
+		if (found && query.operation.at(i) == "=") { // If index can help
+			resLoc = IndexManager->Select(query.tableName,
+				query.columnIndex.at(i), query.type.at(i),
 				query.value.at(i));
 		}
 		else {
-			resLoc = IndexManager->Select(page, offset,
-				query.columnIndex.at(i), query.operation.at(i),
+			resLoc = RecordManager->Select(query.tableName,
+				query.columnIndex.at(i), query.type.at(i), query.operation.at(i),
 				query.value.at(i));
 		}
 		allLoc.push_back(resLoc);
@@ -118,6 +138,10 @@ int API_Drop(string name) {
 	int count = API_Delete(query);
 
 	// drop from calalog
-	CatalogManager->dropTable(name);
+	CatalogManager->dropTable(name, 1);
 	return count;
+}
+
+bool API_FindIndex(string name) {
+	return IndexManager->findBPlus(name);
 }

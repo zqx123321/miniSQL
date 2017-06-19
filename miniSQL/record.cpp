@@ -154,6 +154,59 @@ set<Location> Record::Select(string table) {
 	return result;
 }
 
+vector<AidedNode>  Record::SelectForAidedNode(string table, int column) {
+	vector<AidedNode> allAidedNodes;
+
+	int pageNum = BufferManager->pageList.size();
+	for (int i = 0; i < pageNum; i++) {
+
+		if (BufferManager->pageList.at(i).type != RECORD)
+			continue;
+		const char* data = BufferManager
+			->readPage(RECORD, BufferManager->pageList.at(i).offset);
+
+		int index = 0;
+		while (data[index] == '#' || data[index] == '/') {
+			if (data[index] == '/') {
+				index++;
+				while (data[index] != '/')
+					index++;
+				index++;
+				continue;
+			}
+			int index2 = index + 2; // skip # and space
+			string temp;
+			while (data[index2] != ' ') {
+				temp += data[index2];
+				index2++;
+			}
+			index2++;
+			if (temp == table) {
+				for (int j = 0; j <= column; j++) {
+					temp.clear();
+					while (data[index2] != ' ') {
+						temp += data[index2];
+						index2++;
+					}
+					index2++;
+				}
+
+				string value = temp;
+				int page = i;
+				int offset = index;
+				Location loc(page, offset);
+				AidedNode node(temp, loc);
+				allAidedNodes.push_back(node);
+			}
+			while (data[index] != '*')
+				index++;
+			index++;
+		}
+	}
+
+	return allAidedNodes;
+}
+
 void Record::deleteRecord(set<Location> loc) {
 	set<Location>::iterator iter;
 	for (iter = loc.begin(); iter != loc.end(); iter++) {
@@ -175,4 +228,5 @@ void Record::deleteRecord(set<Location> loc) {
 			writeData, strlen(writeData), COVER);
 	}
 }
+
 

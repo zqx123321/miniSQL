@@ -8,6 +8,7 @@ public:
 		int attrIndex, dataType type,
 		string operation, string value);
 	set<Location> Select(string table);
+	vector<AidedNode> SelectForAidedNode(string table, int index);
 	void showRecord(int attrNum, set<Location> loc);
 	void deleteRecord(set<Location> loc);
 };
