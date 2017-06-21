@@ -99,6 +99,7 @@ bool Buffer::WritePage(fileType type, int offset,
 		if (mode == COVER) {
 			memcpy(current.data, source, size);
 			current.dataSize = size;
+			
 		}
 		else if (mode == ADD) {
 			memcpy(current.data + current.dataSize, source, size);
@@ -123,6 +124,7 @@ bool Buffer::WritePage(fileType type, int offset,
 		Page& current = pageList.at(i);
 
 		if (mode == COVER) {
+			
 			memcpy(current.data, source, size);
 			current.dataSize = size;
 		}
@@ -133,7 +135,6 @@ bool Buffer::WritePage(fileType type, int offset,
 		
 		current.dirty = true;
 	}
-
 	return true;
 }
 

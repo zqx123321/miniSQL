@@ -1,3 +1,29 @@
-select * from jzf;
-select * from jzf where age < 20 and age > 18;
+create table teacher
+	(name char(8) unique, 
+	 age int, 
+	 salary float, 
+	 primary key(name));
+
+insert into teacher values
+	('Steven', 34, 100000.0),
+	('Taylor', 23, 32000.0),
+	('Ultra', 44, 200000.0),
+	('Victor', 45, 180000.0);
+
+select * from teacher;
+
+select * from teacher where name = 'Ultra';
+
+select * from teacher where age > 30 and age <= 44;
+
+select * from teacher where salary <> 32000.0;
+
+create index name_index on teacher(name);
+
+drop index name_index;
+
+delete from teacher where age < 35;
+
+drop table teacher;
+
 quit

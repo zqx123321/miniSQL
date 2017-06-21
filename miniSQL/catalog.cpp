@@ -90,12 +90,13 @@ void Catalog::CreateIndex(TableDef & table, int colIndex,Location root) {
 }
 
 void Catalog::dropIndex(indexInfo info) {
+	
 	TableDef & table = FetchTable(info.tableName);
 	int colIndex = info.index;
 	table.attrList.at(colIndex).hasIndex = false;
 	table.attrList.at(colIndex).indexOffset = -1;
 	table.attrList.at(colIndex).indexPage = -1;
-
+	
 	dropTable(table.name, 0);
 	CreateTable(table, 0);
 }
@@ -156,6 +157,7 @@ void Catalog::dropTable(string table, int mode) {
 
 				BufferManager->WritePage(CATALOG, BufferManager->pageList.at(i).offset,
 					writeData, strlen(writeData), COVER);
+				break;
 			}
 			while (data[index] != '*')
 				index++;

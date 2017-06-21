@@ -190,7 +190,7 @@ void INTERPRETER_Create() {
 
 			API_CreateTable(newTable);
 			cout << "Create successfully!" << endl;
-			cout << newTable.columnNum << " row(s) affected." << endl;
+			cout << newTable.columnNum << " column(s) affected." << endl;
 		}
 		else {
 			throw "Table name empty!";

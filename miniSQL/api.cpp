@@ -21,6 +21,7 @@ int API_CreateIndex(string indexName, TableDef & table, int index) {
 }
 
 int API_DropIndex(string name) {
+	
 	indexInfo info = IndexManager->dropBPlus(name);
 	CatalogManager->dropIndex(info);
 	return 0;
@@ -137,7 +138,7 @@ int API_Drop(string name) {
 	query.conditionNum = 0;
 	int count = API_Delete(query);
 
-	// drop from calalog
+	// drop from calalog	
 	CatalogManager->dropTable(name, 1);
 	return count;
 }

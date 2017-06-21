@@ -83,7 +83,7 @@ indexInfo Index::dropBPlus(string name) {
 	table = allIndices.at(i).tableName;
 	infoIndex = allIndices.at(i).index;
 	allIndices.erase(allIndices.begin() + i);
-
+	
 	// erase record in page in memory
 	int pageNum = BufferManager->pageList.size();
 	for (int i = 0; i < pageNum; i++) {
@@ -117,16 +117,17 @@ indexInfo Index::dropBPlus(string name) {
 				while (writeData[index] != '*')
 					index++;
 				writeData[index] = '/';
-
 				BufferManager->WritePage(INDEX, BufferManager->pageList.at(i).offset,
 					writeData, strlen(writeData), COVER);
+				
+				break;
 			}
 			while (data[index] != '*')
 				index++;
 			index++;
 		}
 	}
-
+	
 	return indexInfo(table, infoIndex);
 }
 
