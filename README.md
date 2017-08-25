@@ -25,8 +25,8 @@ Indexes are implemented through the data structure of **B plus trees**.
 Users can add an index based on the **primary key** in a table.  
 
 ## About record
-Users are able to search, insert or delete severals records in a table.  
-Additionally, in the search statement, conditions can be combined with word **and**,  
+Users are able to select, insert or delete severals records in a table.  
+Additionally, in the select statement, conditions can be combined with word **and**,  
 and both **equality** queries and **interval** queries are supported.  
 
 # 3. ARCHITECTURE
@@ -57,18 +57,51 @@ Make sure that the consistence of relative paths among all the folders.
 - Insert several records  
 ![](./images/usage_2.png)  
 - Create an index on the table  
-![](./images/usage_3.png)  
-  
+![](./images/usage_3.png)   
 *p.s. The result of the modification that happens in the underlying file can be seen as follows:*  
 ![](./images/usage_4.png)  
-
-
-
+- Equality select  
+- Range select  
+- Delete the index  
+- Delete several records  
+- Delete the table  
+- File execution  
+The sample file contents:  
+    create table teacher  
+    (name char(8) unique,  
+    age int,  
+    salary float,  
+    primary key(name));  
+  
+    insert into teacher values  
+	  ('Steven', 34, 100000.0),  
+	  ('Taylor', 23, 32000.0),  
+	  ('Ultra', 44, 200000.0),  
+	  ('Victor', 45, 180000.0);  
+  
+    select * from teacher;  
+  
+    select * from teacher where name = 'Ultra';  
+  
+    select * from teacher where age > 30 and age <= 44;  
+  
+    select * from teacher where salary <> 32000.0;  
+  
+    create index name_index on teacher(name);  
+  
+    drop index name_index;  
+  
+    delete from teacher where age < 35;  
+  
+    drop table teacher;  
+  
+    quit`  
+  
 # 5. LICENCE
 The content of all the codes are supposed to use a licence [AGPLv3](./LICENCE)  
 
 # 6. HOW TO CONTRIBUTE
-1. Sign a Contributor License Agreement, if you have not yet done so (see details above).  
+1. Learn what is a AGPLv3, if you have not yet done so (see details above).  
 2.  Create your change to the repo in question.
 - Fork the desired repo, develop and test your code changes.
 - Ensure that your code is clear and comprehensible.
