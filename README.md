@@ -4,8 +4,13 @@ As a homework assigned in the **database system** course for sophomore majoring 
 it is an **individual project** for **non-comercial** purposes.
 This system allows you to manage databases in simple SQL statement,
 and these databases are supposed to store in your computers locally.
+<<<<<<< HEAD
 
 ![](./images/overview_1.png)
+=======
+  
+![](./images/overview_1.png)  
+>>>>>>> origin/master
 
 # 2. FUNCTIONS
 ## Overall
@@ -33,17 +38,32 @@ and both **equality** queries and **interval** queries are supported.
 My MiniSQL's architecture takes the advantage of the **traditional** one. The connections
 of its components are shown as follows:
 
-![](./images/architecture_1.png)  
+![](./images/Architecture_1.png)  
+
+- **Interpreter**: serves as a bridge between users and the kernel of the system. To be exact
+it contains the textural interaction interface with friendly prompts and information, as 
+well as interpretion from SQL statements to internal commands.
+- **API**: the entrance of the kernel of the system, which distributes internal commands from
+ interpreter to three main modules - index, record and catalog manager.  
+- **Catalog manager**: construct a meta table, which stores the logical structure of 
+all the existing tables.
+- **Record manager**: provide interfaces for record operation.  
+- **Index manager**: provide interfaces for index operation based on B plus tree.
+- **Buffer manager**: stimulates the behavior of a common operating system. 
+That is, it attempts to reduce the accesses to disks by using allocating some space 
+in the memory as a buffer pool, which contains of lots of pages.  The memory management 
+algorithm is *FIFO*, i.e. always discard the unpinned page that was the first to be used 
+among all pages in the pool.  
 
 Particularly, Recorder Manager, Index Manager and Catalog Manager are NOT designed to 
-read or write the database files directly for the sake of **physical independence**.
+read or write the database files directly for the sake of **physical independence**.  
 Only with the aid of **Buffer Manager** can they accomplish the I/O tasks.  
 Furthermore, these three modules will NOT call one another, and the underlying Buffer 
 Manager will NOT call these three modules.
 
 # 4. USAGE
 Make sure that the consistence of relative paths among all the folders.
-##The hierarchy of the file:
+##  The hierarchy of the file:
 - MiniSQL: source code
 - catalog: catalog files
 - record: record files
@@ -51,7 +71,12 @@ Make sure that the consistence of relative paths among all the folders.
 - execFile: files that can exec in MiniSQL
 - images: images used in readme  
 
-##To exemplify, following are snapshots of some sequential operations:
+## How to build the project
+One can build it readily by creating an empty VS project exactly in the root folder and adding all 
+the source code files, i.e. \*.cpp, \*.h to the project before compiling.  
+The executive file is supposed to be found in the folder whose path is ./miniSQL/Debug .  
+
+##  To exemplify, following are snapshots of some sequential operations:
 - Create a table  
 ![](./images/usage_1.png)  
 - Insert several records  
@@ -61,41 +86,55 @@ Make sure that the consistence of relative paths among all the folders.
 *p.s. The result of the modification that happens in the underlying file can be seen as follows:*  
 ![](./images/usage_4.png)  
 - Equality select  
+![](./images/usage_5.png)  
 - Range select  
+![](./images/usage_6.png)  
 - Delete the index  
+![](./images/usage_7.png)  
+*The result of the modification that happens in the underlying file can be seen as follows:*  
+![](./images/usage_8.png)  
+*p.s. Through lazy deletion, only the labels of the specific index has been changed.*  
 - Delete several records  
+![](./images/usage_9.png)  
 - Delete the table  
+![](./images/usage_10.png)  
 - File execution  
-The sample file contents:  
-    create table teacher  
-    (name char(8) unique,  
-    age int,  
-    salary float,  
-    primary key(name));  
+The sample file contents:  
+```
+create table teacher  
+(name char(8) unique,  
+age int,  
+salary float,  
+primary key(name));  
   
-    insert into teacher values  
-	  ('Steven', 34, 100000.0),  
-	  ('Taylor', 23, 32000.0),  
-	  ('Ultra', 44, 200000.0),  
-	  ('Victor', 45, 180000.0);  
+insert into teacher values  
+('Steven', 34, 100000.0),  
+('Taylor', 23, 32000.0),  
+('Ultra', 44, 200000.0),  
+('Victor', 45, 180000.0);  
   
-    select * from teacher;  
+select * from teacher;  
   
-    select * from teacher where name = 'Ultra';  
+select * from teacher where name = 'Ultra';  
   
-    select * from teacher where age > 30 and age <= 44;  
+select * from teacher where age > 30 and age <= 44;  
   
-    select * from teacher where salary <> 32000.0;  
+select * from teacher where salary <> 32000.0;  
   
-    create index name_index on teacher(name);  
+create index name_index on teacher(name);  
   
-    drop index name_index;  
+drop index name_index;  
   
-    delete from teacher where age < 35;  
+delete from teacher where age < 35;  
   
-    drop table teacher;  
+drop table teacher;  
   
-    quit`  
+quit  
+```  
+And the result can be seen as follows:  
+![](./images/usage_11.png)  
+![](./images/usage_12.png)  
+![](./images/usage_13.png)  
   
 # 5. LICENCE
 The content of all the codes are supposed to use a licence [AGPLv3](./LICENSE)  
