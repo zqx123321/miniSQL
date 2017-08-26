@@ -4,7 +4,7 @@ As a homework assigned in the **database system** course for sophomore majoring 
 it is an **individual project** for **non-comercial** purposes.
 This system allows you to manage databases in simple SQL statement,
 and these databases are supposed to store in your computers locally.
-  
+
 ![](./images/overview_1.png)
 
 # 2. FUNCTIONS
@@ -98,7 +98,7 @@ The sample file contents:
     quit`  
   
 # 5. LICENCE
-The content of all the codes are supposed to use a licence [AGPLv3](./LICENCE)  
+The content of all the codes are supposed to use a licence [AGPLv3](./LICENSE)  
 
 # 6. HOW TO CONTRIBUTE
 1. Learn what is a AGPLv3, if you have not yet done so (see details above).  
