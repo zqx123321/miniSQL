@@ -69,7 +69,7 @@ Make sure that the consistence of relative paths among all the folders.
 ## How to build the project
 One can build it readily by creating an empty VS project exactly in the root folder and adding all 
 the source code files, i.e. \*.cpp, \*.h to the project before compiling.  
-The executive file is supposed to be create in the folder whose path is ./miniSQL/Debug .  
+The executive file is supposed to be found in the folder whose path is ./miniSQL/Debug .  
 
 ##  To exemplify, following are snapshots of some sequential operations:
 - Create a table  
