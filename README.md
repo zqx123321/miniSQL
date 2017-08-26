@@ -67,9 +67,9 @@ Make sure that the consistence of relative paths among all the folders.
 - images: images used in readme  
 
 ## How to build the project
-One can build it readily by creating an empty C++ project and adding all 
-the source code files, i.e. \*.cpp, \*.h before compiling.  
-The executive file is expected to locate in the very folder named MiniSQL.  
+One can build it readily by creating an empty VS project exactly in the root folder and adding all 
+the source code files, i.e. \*.cpp, \*.h to the project before compiling.  
+The executive file is supposed to be create in the folder whose path is ./miniSQL/Debug .  
 
 ##  To exemplify, following are snapshots of some sequential operations:
 - Create a table  
